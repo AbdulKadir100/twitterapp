@@ -1,0 +1,19 @@
+package com.kadir.abdul.Twitter_App.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+
+
+@Data
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class ApiResponse<T> {
+    private String responseMessage;
+    private int responseCode;
+    private T data;
+
+}
