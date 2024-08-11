@@ -1,6 +1,11 @@
 package com.kadir.abdul.Twitter_App.service.Imlp;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.kadir.abdul.Twitter_App.dto.AddUserRequest;
+import com.kadir.abdul.Twitter_App.dto.UserDto;
 import com.kadir.abdul.Twitter_App.entity.User;
 import com.kadir.abdul.Twitter_App.repository.UserRepository;
 import com.kadir.abdul.Twitter_App.response.ApiResponse;
@@ -18,6 +24,8 @@ import com.kadir.abdul.Twitter_App.utils.MessageUtil;
 public class UserServiceImpl implements UserService {
     @Autowired
     private final UserRepository userRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -42,7 +50,7 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-   @Async
+    @Async
     public CompletableFuture<ResponseEntity<ApiResponse<String>>> saveNewUser(AddUserRequest request) {
         return CompletableFuture.supplyAsync(() -> {
             User user = User.builder()
@@ -52,16 +60,62 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse<>(
-                        MessageUtil.SUCCESS,
-                        HttpStatus.CREATED.value(),
-                        MessageUtil.USER_ADDED
-                    ));
+                            MessageUtil.SUCCESS,
+                            HttpStatus.CREATED.value(),
+                            MessageUtil.USER_ADDED));
         }).exceptionally(ex -> {
             ApiResponse<String> response = new ApiResponse<>(MessageUtil.INTERNAL_ERROR,
-                                HttpStatus.SERVICE_UNAVAILABLE.value(),
-                                MessageUtil.INTERNAL_ERROR);
+                    HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    MessageUtil.INTERNAL_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(response);
         });
     }
+
+    /**
+     * Retrieves a list of users based on their role and maps them to UserResponse
+     * objects.
+     * Returns a ResponseEntity containing the list of UserResponse objects.
+     *
+     * @param roleName The role name used to filter users.
+     * @return A Mono of ResponseEntity containing a list of UserResponse objects.
+     */
+
+     @Override
+     public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role) {
+     
+         return CompletableFuture.supplyAsync(() -> userRepository.findUserByRole(role))
+                 .thenCompose(users -> {
+                     if (users.isEmpty()) {
+                         return CompletableFuture.completedFuture(
+                                 ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                         .body(new ApiResponse<>("No users found for the given role"))
+                         );
+                     }
+     
+                     // Logging the event (assuming logger is properly configured)
+                     logger.info("Users found for role: {}", role);
+     
+                     List<UserDto> userDtos = users.stream()
+                             .map(user -> new UserDto(user.getUid(), user.getUName(), user.getURole()))
+                             .collect(Collectors.toList());
+     
+                     ApiResponse<List<UserDto>> response = new ApiResponse<>(
+                             MessageUtil.SUCCESS,
+                             HttpStatus.OK.value(),
+                             userDtos
+                     );
+     
+                     return CompletableFuture.completedFuture(
+                             ResponseEntity.status(HttpStatus.OK).body(response)
+                     );
+                 });
+                //  .exceptionally(ex -> {
+                //      logger.error("An error occurred while finding users by role: {}", role, ex);
+                //      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                //              .body(new ApiResponse<>("An error occurred: " + ex.getMessage()));
+                //  });
+     }
+     
+
 }

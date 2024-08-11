@@ -14,4 +14,5 @@ public class MessageUtil {
    public final static String MESSAGE_PUBLISHED_SUCCESSFULLY="Great, message published successfully";
    public final static String SUCCESS="Success";
    public final static String FAIL="Fail";
+   public final static String FOUND="Users found successfully!";
 }
