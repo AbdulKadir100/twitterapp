@@ -15,5 +15,14 @@ public class ApiResponse<T> {
     private String responseMessage;
     private int responseCode;
     private T data;
+    
+    public ApiResponse(String responseMessage) {
+        this.responseMessage = responseMessage;
+    }
 
+    public ApiResponse(T data) {
+        this.data = data;
+    }
+
+    
 }
