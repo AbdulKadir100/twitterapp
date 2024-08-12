@@ -25,15 +25,7 @@ public class UserServiceImpl implements UserService {
         @Autowired
         private final UserRepository userRepository;
 
-<<<<<<< HEAD
         private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-=======
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
->>>>>>> main
 
         public UserServiceImpl(UserRepository userRepository) {
                 this.userRepository = userRepository;
@@ -153,75 +145,4 @@ public class UserServiceImpl implements UserService {
                                 });
         }
 
-<<<<<<< HEAD
-=======
-    @Async
-    public CompletableFuture<ResponseEntity<ApiResponse<String>>> saveNewUser(AddUserRequest request) {
-        return CompletableFuture.supplyAsync(() -> {
-            User user = User.builder()
-                    .uRole(request.getURole())
-                    .uName(request.getUName())
-                    .build();
-            userRepository.save(user);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse<>(
-                            MessageUtil.SUCCESS,
-                            HttpStatus.CREATED.value(),
-                            MessageUtil.USER_ADDED));
-        }).exceptionally(ex -> {
-            ApiResponse<String> response = new ApiResponse<>(MessageUtil.INTERNAL_ERROR,
-                    HttpStatus.SERVICE_UNAVAILABLE.value(),
-                    MessageUtil.INTERNAL_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(response);
-        });
-    }
-
-    /**
-     * Retrieves a list of users based on their role and maps them to UserResponse
-     * objects.
-     * Returns a ResponseEntity containing the list of UserResponse objects.
-     *
-     * @param roleName The role name used to filter users.
-     * @return A Mono of ResponseEntity containing a list of UserResponse objects.
-     */
-
-     @Override
-     public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role) {
-     
-         return CompletableFuture.supplyAsync(() -> userRepository.findUserByRole(role))
-                 .thenCompose(users -> {
-                     if (users.isEmpty()) {
-                         return CompletableFuture.completedFuture(
-                                 ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                         .body(new ApiResponse<>("No users found for the given role"))
-                         );
-                     }
-     
-                     // Logging the event (assuming logger is properly configured)
-                     logger.info("Users found for role: {}", role);
-     
-                     List<UserDto> userDtos = users.stream()
-                             .map(user -> new UserDto(user.getUid(), user.getUName(), user.getURole()))
-                             .collect(Collectors.toList());
-     
-                     ApiResponse<List<UserDto>> response = new ApiResponse<>(
-                             MessageUtil.SUCCESS,
-                             HttpStatus.OK.value(),
-                             userDtos
-                     );
-     
-                     return CompletableFuture.completedFuture(
-                             ResponseEntity.status(HttpStatus.OK).body(response)
-                     );
-                 });
-                //  .exceptionally(ex -> {
-                //      logger.error("An error occurred while finding users by role: {}", role, ex);
-                //      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                //              .body(new ApiResponse<>("An error occurred: " + ex.getMessage()));
-                //  });
-     }
-     
-
->>>>>>> main
 }

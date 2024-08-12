@@ -16,10 +16,7 @@ import com.kadir.abdul.Twitter_App.dto.UserDto;
 import com.kadir.abdul.Twitter_App.response.ApiResponse;
 import com.kadir.abdul.Twitter_App.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
-<<<<<<< HEAD
 import org.springframework.web.bind.annotation.PathVariable;
-=======
->>>>>>> main
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
@@ -38,7 +35,6 @@ public class UserController {
     }
 
     @GetMapping("/role")
-<<<<<<< HEAD
     public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findByUserRole(
             @RequestParam(name = "role") String role) {
         return userService.findUserListByRole(role).exceptionally(ex -> {
@@ -61,10 +57,6 @@ public class UserController {
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         });
-=======
-    public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findByUserRole(@RequestParam(name = "role") String role) {
-        return userService.findUserListByRole(role);
->>>>>>> main
     }
 
 }
