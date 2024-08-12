@@ -22,100 +22,127 @@ import com.kadir.abdul.Twitter_App.utils.MessageUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private final UserRepository userRepository;
+        @Autowired
+        private final UserRepository userRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+        private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+        public UserServiceImpl(UserRepository userRepository) {
+                this.userRepository = userRepository;
+        }
 
-    @Async
-    @Override
-    public CompletableFuture<ResponseEntity<ApiResponse<String>>> addUser(AddUserRequest request) {
-        String username = request.getUName();
+        @Async
+        @Override
+        public CompletableFuture<ResponseEntity<ApiResponse<String>>> addUser(AddUserRequest request) {
+                String username = request.getUName();
 
-        return userRepository.findByUsername(username)
-                .thenCompose(existingUser -> {
-                    if (existingUser != null) {
-                        ApiResponse<String> response = new ApiResponse<>(MessageUtil.FAIL,
-                                HttpStatus.CONFLICT.value(),
-                                MessageUtil.DUPLICATE_USER);
-                        return CompletableFuture
-                                .completedFuture(ResponseEntity.status(HttpStatus.CONFLICT).body(response));
-                    } else {
-                        return saveNewUser(request);
-                    }
+                return userRepository.findByUsername(username)
+                                .thenCompose(existingUser -> {
+                                        if (existingUser != null) {
+                                                ApiResponse<String> response = new ApiResponse<>(MessageUtil.FAIL,
+                                                                HttpStatus.CONFLICT.value(),
+                                                                MessageUtil.DUPLICATE_USER);
+                                                return CompletableFuture
+                                                                .completedFuture(ResponseEntity
+                                                                                .status(HttpStatus.CONFLICT)
+                                                                                .body(response));
+                                        } else {
+                                                return saveNewUser(request);
+                                        }
+                                });
+        }
+
+        @Async
+        public CompletableFuture<ResponseEntity<ApiResponse<String>>> saveNewUser(AddUserRequest request) {
+                return CompletableFuture.supplyAsync(() -> {
+                        User user = User.builder()
+                                        .uRole(request.getURole())
+                                        .uName(request.getUName())
+                                        .build();
+                        userRepository.save(user);
+                        return ResponseEntity.status(HttpStatus.CREATED)
+                                        .body(new ApiResponse<>(
+                                                        MessageUtil.SUCCESS,
+                                                        HttpStatus.CREATED.value(),
+                                                        MessageUtil.USER_ADDED));
+                }).exceptionally(ex -> {
+                        ApiResponse<String> response = new ApiResponse<>(MessageUtil.INTERNAL_ERROR,
+                                        HttpStatus.SERVICE_UNAVAILABLE.value(),
+                                        MessageUtil.INTERNAL_ERROR);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(response);
                 });
-    }
+        }
 
-    @Async
-    public CompletableFuture<ResponseEntity<ApiResponse<String>>> saveNewUser(AddUserRequest request) {
-        return CompletableFuture.supplyAsync(() -> {
-            User user = User.builder()
-                    .uRole(request.getURole())
-                    .uName(request.getUName())
-                    .build();
-            userRepository.save(user);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse<>(
-                            MessageUtil.SUCCESS,
-                            HttpStatus.CREATED.value(),
-                            MessageUtil.USER_ADDED));
-        }).exceptionally(ex -> {
-            ApiResponse<String> response = new ApiResponse<>(MessageUtil.INTERNAL_ERROR,
-                    HttpStatus.SERVICE_UNAVAILABLE.value(),
-                    MessageUtil.INTERNAL_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(response);
-        });
-    }
+        /**
+         * Retrieves a list of users based on their role and maps them to UserResponse
+         * objects.
+         * Returns a ResponseEntity containing the list of UserResponse objects.
+         *
+         * @param roleName The role name used to filter users.
+         * @return A Mono of ResponseEntity containing a list of UserResponse objects.
+         */
 
-    /**
-     * Retrieves a list of users based on their role and maps them to UserResponse
-     * objects.
-     * Returns a ResponseEntity containing the list of UserResponse objects.
-     *
-     * @param roleName The role name used to filter users.
-     * @return A Mono of ResponseEntity containing a list of UserResponse objects.
-     */
+        @Override
+        public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role) {
 
-     @Override
-     public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role) {
-     
-         return CompletableFuture.supplyAsync(() -> userRepository.findUserByRole(role))
-                 .thenCompose(users -> {
-                     if (users.isEmpty()) {
-                         return CompletableFuture.completedFuture(
-                                 ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                         .body(new ApiResponse<>("No users found for the given role"))
-                         );
-                     }
-     
-                     // Logging the event (assuming logger is properly configured)
-                     logger.info("Users found for role: {}", role);
-     
-                     List<UserDto> userDtos = users.stream()
-                             .map(user -> new UserDto(user.getUid(), user.getUName(), user.getURole()))
-                             .collect(Collectors.toList());
-     
-                     ApiResponse<List<UserDto>> response = new ApiResponse<>(
-                             MessageUtil.SUCCESS,
-                             HttpStatus.OK.value(),
-                             userDtos
-                     );
-     
-                     return CompletableFuture.completedFuture(
-                             ResponseEntity.status(HttpStatus.OK).body(response)
-                     );
-                 });
-                //  .exceptionally(ex -> {
-                //      logger.error("An error occurred while finding users by role: {}", role, ex);
-                //      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                //              .body(new ApiResponse<>("An error occurred: " + ex.getMessage()));
-                //  });
-     }
-     
+                return CompletableFuture.supplyAsync(() -> userRepository.findUserByRole(role))
+                                .thenCompose(users -> {
+                                        if (users.isEmpty()) {
+                                                return CompletableFuture.completedFuture(
+                                                                ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                                                                .body(new ApiResponse<>(
+                                                                                                "No users found for the given role")));
+                                        }
+
+                                        // Logging the event (assuming logger is properly configured)
+                                        logger.info("Users found for role: {}", role);
+
+                                        List<UserDto> userDtos = users.stream()
+                                                        .map(user -> new UserDto(user.getUid(), user.getUName(),
+                                                                        user.getURole()))
+                                                        .collect(Collectors.toList());
+
+                                        ApiResponse<List<UserDto>> response = new ApiResponse<>(
+                                                        MessageUtil.SUCCESS,
+                                                        HttpStatus.OK.value(),
+                                                        userDtos);
+
+                                        return CompletableFuture.completedFuture(
+                                                        ResponseEntity.status(HttpStatus.OK).body(response));
+                                });
+        
+        }
+
+        /**
+         * Retrieves a user by their ID and returns it as a Mono<User>.
+         * Throws a RecordNotFoundException if no user is found with the given ID.
+         *
+         * @param id The ID of the user to retrieve.
+         * @return A CompletableFuture of User.
+         */
+        @Override
+        public CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> findById(Long id) {
+                return CompletableFuture.supplyAsync(() -> userRepository.findById(id))
+                                .thenCompose(userOptional -> {
+                                        if (userOptional.isEmpty()) {
+                                                return CompletableFuture.completedFuture(
+                                                                ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                                                                .body(new ApiResponse<>(
+                                                                                                MessageUtil.RECORD_NOT_FOUND,
+                                                                                                HttpStatus.NOT_FOUND
+                                                                                                                .value())));
+                                        }
+
+                                        // Convert the found User entity to UserDto
+                                        User user = userOptional.get();
+                                        UserDto userDto = new UserDto(user.getUid(), user.getUName(), user.getURole());
+
+                                        // Wrap the UserDto in ApiResponse and ResponseEntity
+                                        return CompletableFuture.completedFuture(
+                                                        ResponseEntity.ok(new ApiResponse<>(MessageUtil.SUCCESS,
+                                                                        HttpStatus.OK.value(), userDto)));
+                                });
+        }
 
 }
