@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,9 +18,24 @@ public class ApiResponse<T> {
         this.responseMessage = responseMessage;
     }
 
+<<<<<<< HEAD
+    public ApiResponse(String responseMessage, int responseCode) {
+        this.responseMessage = responseMessage;
+        this.responseCode = responseCode;
+    }
+
+    public ApiResponse(String responseMessage) {
+        this.responseMessage = responseMessage;
+    }
+
+=======
+>>>>>>> main
     public ApiResponse(T data) {
         this.data = data;
     }
 
+<<<<<<< HEAD
+=======
     
+>>>>>>> main
 }

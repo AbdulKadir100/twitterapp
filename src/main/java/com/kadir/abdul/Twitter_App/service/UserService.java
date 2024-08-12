@@ -13,4 +13,7 @@ public interface UserService {
     CompletableFuture<ResponseEntity<ApiResponse<String>>> addUser(AddUserRequest request);
     CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role);
 
+
+    CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> findById(Long id);
+
 }
