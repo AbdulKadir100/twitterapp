@@ -11,6 +11,7 @@ import com.kadir.abdul.Twitter_App.response.ApiResponse;
 
 public interface UserService {
     CompletableFuture<ResponseEntity<ApiResponse<String>>> addUser(AddUserRequest request);
+    CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role);
 
     CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role);
 
