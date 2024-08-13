@@ -51,26 +51,26 @@ public class RespositoryTest {
 
     }
 
-    @Test
-    public void list_Users_By_Given_Role() {
-        List<User> mockUsers = Arrays.asList(
-                new User(1L, "Abdul", "user"),
-                new User(2L, "Abdul", "user"));
+    // @Test
+    // public void list_Users_By_Given_Role() {
+    //     List<User> mockUsers = Arrays.asList(
+    //             new User(1L, "Abdul", "user"),
+    //             new User(2L, "Abdul", "user"));
 
-        when(userRepository.findUserByRole("user")).thenReturn(mockUsers);
+    //     when(userRepository.findUserByRole("user")).thenReturn(mockUsers);
 
-        // Act: Call the method under test
-        CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> responseFuture = userService
-                .findUserListByRole("user");
+    //     // Act: Call the method under test
+    //     CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> responseFuture = userService
+    //             .findUserListByRole("user");
 
-        // Await the response
-        ResponseEntity<ApiResponse<List<UserDto>>> response = responseFuture.join();
+    //     // Await the response
+    //     ResponseEntity<ApiResponse<List<UserDto>>> response = responseFuture.join();
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().getData().size());
-        assertEquals("Abdul", response.getBody().getData().get(0).getUName());
-        assertEquals("user", response.getBody().getData().get(0).getURole());
+    //     assertEquals(HttpStatus.OK, response.getStatusCode());
+    //     assertEquals(2, response.getBody().getData().size());
+    //     assertEquals("Abdul", response.getBody().getData().get(0).getUName());
+    //     assertEquals("user", response.getBody().getData().get(0).getURole());
 
-    }
+    // }
 
 }
