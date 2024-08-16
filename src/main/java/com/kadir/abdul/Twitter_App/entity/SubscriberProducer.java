@@ -24,7 +24,7 @@ public class SubscriberProducer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sp_ID")
-    private Long spId;
+    private Long id;
 
     @Column(name = "subscriberId")
     private Long subscriberId;
