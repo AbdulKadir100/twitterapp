@@ -3,8 +3,6 @@ package com.kadir.abdul.Twitter_App.service.Imlp;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +23,9 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
         private SubscriberProducerRepository producerRepository;
         private UserService userService;
 
-       // private final ExecutorService executor = Executors.newFixedThreadPool(5); // Customize the thread pool size as
-                                                                                  // needed
+        // private final ExecutorService executor = Executors.newFixedThreadPool(5); //
+        // Customize the thread pool size as
+        // needed
 
         public SubscriberProducerServiceImpl(SubscriberProducerRepository producerRepository, UserService userService) {
                 this.producerRepository = producerRepository;
@@ -40,6 +39,7 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                 .thenApply(producerIds -> ResponseEntity.ok(producerIds));
         }
 
+        @SuppressWarnings("unchecked")
         @Async
         @Override
         public CompletableFuture<ResponseEntity<ApiResponse<String>>> subscribe(Subscribe request) {
@@ -98,7 +98,8 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                                 newSubscription.setProducerId(producerId);
                                                                 newSubscription.setSubscriberId(subscriberId);
 
-                                                                return ((CompletionStage<ResponseEntity<List<String>>>) producerRepository.save(newSubscription))
+                                                                return ((CompletionStage<ResponseEntity<List<String>>>) producerRepository
+                                                                                .save(newSubscription))
                                                                                 .thenApply(savedSubscription -> ResponseEntity
                                                                                                 .ok(new ApiResponse<>(
                                                                                                                 MessageUtil.SUCCESS,
@@ -106,17 +107,17 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                                                                                 MessageUtil.SUBSCRIPTION_SUCCESSFUL)));
                                                         });
                                 })
-                .exceptionally(ex -> {
-                // Log the exception (you can use your logging framework here)
-                // log.error("Exception occurred while subscribing:", ex);
-                ex.printStackTrace(); // Temporary console print for debugging
+                                .exceptionally(ex -> {
+                                        // Log the exception (you can use your logging framework here)
+                                        // log.error("Exception occurred while subscribing:", ex);
+                                        ex.printStackTrace(); // Temporary console print for debugging
 
-                // Return a generic error response
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse<>(MessageUtil.FAIL,
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "An error occurred while processing your subscription."));
-                });
+                                        // Return a generic error response
+                                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                                        .body(new ApiResponse<>(MessageUtil.FAIL,
+                                                                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                                                        "An error occurred while processing your subscription."));
+                                });
         }
 
 }
