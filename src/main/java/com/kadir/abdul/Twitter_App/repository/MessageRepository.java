@@ -14,7 +14,8 @@ import com.kadir.abdul.Twitter_App.entity.Message;
 public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = "select m from Message m where m.uid=:uid")
     CompletableFuture<List<Message>> listMessageByProducerId(@Param("uid") Long uid);
-    // @Query(value="select * from T_messages where uid in (:uid)")
-    // Flux<Message> listMessageByProducerIdIn(@Param("uid") List<Integer> uid);
+
+    @Query("SELECT m FROM Message m WHERE m.uid IN :producerIds")
+    CompletableFuture<List<Message>> listMessageByProducerIdIn(@Param("producerIds") List<Long> producerIds);
 
 }
