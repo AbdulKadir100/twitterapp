@@ -3,6 +3,7 @@ package com.kadir.abdul.Twitter_App.controller;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.kadir.abdul.Twitter_App.service.SubscriberProducerService;
 @RestController
 @RequestMapping("/api/v2")
 public class SubscriberProducerController {
+    @Autowired
     private SubscriberProducerService subscriberProducerService;
 
     public SubscriberProducerController(SubscriberProducerService subscriberProducerService) {

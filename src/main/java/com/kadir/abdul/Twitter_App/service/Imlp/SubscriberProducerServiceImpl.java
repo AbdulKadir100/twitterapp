@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -20,7 +21,9 @@ import com.kadir.abdul.Twitter_App.utils.MessageUtil;
 
 @Service
 public class SubscriberProducerServiceImpl implements SubscriberProducerService {
+        @Autowired
         private SubscriberProducerRepository producerRepository;
+        @Autowired
         private UserService userService;
 
         // private final ExecutorService executor = Executors.newFixedThreadPool(5); //
