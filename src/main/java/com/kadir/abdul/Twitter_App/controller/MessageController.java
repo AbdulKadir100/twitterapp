@@ -1,13 +1,17 @@
 package com.kadir.abdul.Twitter_App.controller;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kadir.abdul.Twitter_App.dto.MessageResponse;
 import com.kadir.abdul.Twitter_App.dto.PublishMesssageRequest;
 import com.kadir.abdul.Twitter_App.response.ApiResponse;
 import com.kadir.abdul.Twitter_App.service.MessageService;
@@ -34,6 +38,20 @@ public class MessageController {
     public CompletableFuture<ResponseEntity<ApiResponse<String>>> publishMessage(
             @Valid @RequestBody PublishMesssageRequest request) {
         return messageService.publishMessage(request);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(description = "Get all user messages")
+    public CompletableFuture<ResponseEntity<ApiResponse<List<MessageResponse>>>> getUserMessages(@PathVariable(name = "id") Long id){
+        return messageService.getMessageBySubscriberId(id);
+        
+    }
+
+    @GetMapping("subscriber/{id}")
+    @Operation(description = "Get all subscriber's messages")
+    public CompletableFuture<ResponseEntity<ApiResponse<List<MessageResponse>>>> getMessageBySubscriberId(@PathVariable(name = "id") Long id){
+        return messageService.getMessageBySubscriberId(id);
+        
     }
 
 }

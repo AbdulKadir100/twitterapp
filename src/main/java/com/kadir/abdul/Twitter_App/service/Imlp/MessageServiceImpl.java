@@ -186,8 +186,8 @@ public class MessageServiceImpl implements MessageService {
 
                                         Message savedMessage = messageRepository.save(
                                                         Message.builder()
-                                                                        .contents(message)
                                                                         .uid(userId)
+                                                                        .contents(message)
                                                                         .build());
 
                                         logger.info("Message saved successfully for userId: {}", userId);
