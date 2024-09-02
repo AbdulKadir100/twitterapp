@@ -1,21 +1,24 @@
 package com.kadir.abdul.Twitter_App.dto;
 
-import com.kadir.abdul.Twitter_App.validator.NotNullOrEmpty;
-import com.kadir.abdul.Twitter_App.validator.NotNullOrMin;
-
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublishMesssageRequest {
-    @NotNullOrMin
+    @NotNull(message = "User ID cannot be null")
     private Long userId;
-    @NotNullOrEmpty
+    @NotEmpty(message = "Message cannot be null")
     private String message;
 
 }
