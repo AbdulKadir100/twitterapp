@@ -15,4 +15,6 @@ public class MessageUtil {
    public final static String SUCCESS="Success";
    public final static String FAIL="Fail";
    public final static String FOUND="Users found successfully!";
+
 }
+   
