@@ -7,18 +7,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublishMesssageRequest {
     @NotNull(message = "User ID cannot be null")
-    private Long userId;
+    public Long userId;
     @NotEmpty(message = "Message cannot be null")
-    private String message;
+    public String message;
 
 }
