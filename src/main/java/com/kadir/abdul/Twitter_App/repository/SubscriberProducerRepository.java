@@ -13,6 +13,7 @@ import com.kadir.abdul.Twitter_App.response.ApiResponse;
 
 @Repository
 public interface SubscriberProducerRepository extends JpaRepository<SubscriberProducer, Long> {
+    
     @Query(value = "select producerId from SubscriberProducer  where subscriberId=:subscriberId")
     CompletableFuture<List<Long>> listProducerBySubscriber(@Param("subscriberId") Long subscriberId);
 

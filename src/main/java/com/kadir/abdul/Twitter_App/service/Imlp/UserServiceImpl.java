@@ -1,6 +1,7 @@
 package com.kadir.abdul.Twitter_App.service.Imlp;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -31,25 +32,48 @@ public class UserServiceImpl implements UserService {
                 this.userRepository = userRepository;
         }
 
+         @Async
+        public CompletableFuture<User> validateUserExists(Long userId) {
+
+                Optional<User> opUser = userRepository.findById(userId);
+
+                if (!opUser.isPresent()) {
+                        logger.info("User not found" + opUser.get());
+                }
+
+                return CompletableFuture.supplyAsync(() -> userRepository.findById(userId))
+                                .thenApply(optionalUser -> {
+                                        if (optionalUser.isPresent()) {
+                                                return optionalUser.get();
+                                        } else {
+                                                throw new RuntimeException("User with ID " + userId + " not found");
+                                        }
+                                });
+        }
+
         @Async
         @Override
         public CompletableFuture<ResponseEntity<ApiResponse<String>>> addUser(AddUserRequest request) {
                 String username = request.getUName();
 
+                logger.info("Users found for role: {}", username);
                 return userRepository.findByUsername(username)
-                                .thenCompose(existingUser -> {
-                                        if (existingUser != null) {
-                                                ApiResponse<String> response = new ApiResponse<>(MessageUtil.FAIL,
+                                .thenCompose(optionalUser -> {
+                                        if (optionalUser.isPresent()) {
+                                                // User already exists, return conflict response
+                                                ApiResponse<String> response = new ApiResponse<>(
+                                                                MessageUtil.FAIL,
                                                                 HttpStatus.CONFLICT.value(),
                                                                 MessageUtil.DUPLICATE_USER);
-                                                return CompletableFuture
-                                                                .completedFuture(ResponseEntity
-                                                                                .status(HttpStatus.CONFLICT)
-                                                                                .body(response));
+                                                return CompletableFuture.completedFuture(ResponseEntity
+                                                                .status(HttpStatus.CONFLICT)
+                                                                .body(response));
                                         } else {
+                                                // User doesn't exist, proceed to save new user
                                                 return saveNewUser(request);
                                         }
                                 });
+
         }
 
         @Async
@@ -80,7 +104,7 @@ public class UserServiceImpl implements UserService {
          * Returns a ResponseEntity containing the list of UserResponse objects.
          *
          * @param roleName The role name used to filter users.
-         * @return A Mono of ResponseEntity containing a list of UserResponse objects.
+         * @return A Future of ResponseEntity containing a list of UserResponse objects.
          */
 
         @Override
@@ -88,7 +112,7 @@ public class UserServiceImpl implements UserService {
 
                 return CompletableFuture.supplyAsync(() -> userRepository.findUserByRole(role))
                                 .thenCompose(users -> {
-                                        if (users.isEmpty()) {
+                                        if (users.isEmpty() || users == null) {
                                                 return CompletableFuture.completedFuture(
                                                                 ResponseEntity.status(HttpStatus.NOT_FOUND)
                                                                                 .body(new ApiResponse<>(
@@ -111,7 +135,7 @@ public class UserServiceImpl implements UserService {
                                         return CompletableFuture.completedFuture(
                                                         ResponseEntity.status(HttpStatus.OK).body(response));
                                 });
-        
+
         }
 
         /**

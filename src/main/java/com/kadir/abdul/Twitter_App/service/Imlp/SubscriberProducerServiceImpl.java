@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,8 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
         private SubscriberProducerRepository producerRepository;
         @Autowired
         private UserService userService;
+
+        private static final Logger log = LoggerFactory.getLogger(SubscriberProducerServiceImpl.class);
 
         // private final ExecutorService executor = Executors.newFixedThreadPool(5); //
         // Customize the thread pool size as
@@ -50,6 +54,9 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                 Long subscriberId = request.getSubscriberID();
                 Long producerId = request.getUserId();
 
+                log.info("Subscriber ID: {}",subscriberId);
+                log.info("Producer ID: {}", producerId);
+
                 // Check if both subscriber and producer exist
                 CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> subscriberFuture = userService
                                 .findById(subscriberId);
@@ -60,7 +67,8 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                 .thenCompose(ignored -> {
                                         ResponseEntity<ApiResponse<UserDto>> subscriberResponse = subscriberFuture
                                                         .join();
-                                        ResponseEntity<ApiResponse<UserDto>> producerResponse = producerFuture.join();
+                                        ResponseEntity<ApiResponse<UserDto>> producerResponse = producerFuture
+                                                        .join();
 
                                         ApiResponse<UserDto> subscriberApiResponse = subscriberResponse.getBody();
                                         ApiResponse<UserDto> producerApiResponse = producerResponse.getBody();
@@ -74,11 +82,12 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                                                 MessageUtil.RECORD_NOT_FOUND)));
                                         }
 
-                                        if (!"Producer".equals(producerApiResponse.getData().getURole())) {
+                                        else if (!"Producer".equalsIgnoreCase(producerApiResponse.getData().getURole())) {
                                                 return CompletableFuture.completedFuture(
-                                                                ResponseEntity.ok(new ApiResponse<>(MessageUtil.FAIL,
-                                                                                HttpStatus.FORBIDDEN.value(),
-                                                                                MessageUtil.SUBSCRIPTION_NOT_ALLOW)));
+                                                                ResponseEntity.ok(new ApiResponse<>(
+                                                                        MessageUtil.FAIL,
+                                                                        HttpStatus.FORBIDDEN.value(),
+                                                                        MessageUtil.SUBSCRIPTION_NOT_ALLOW)));
                                         }
 
                                         // Validate that a subscriber cannot make multiple subscriptions for the same
@@ -87,12 +96,11 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                         .thenCompose(existingSubscription -> {
                                                                 if (existingSubscription != null) {
                                                                         return CompletableFuture.completedFuture(
-                                                                                        ResponseEntity.ok(
-                                                                                                        new ApiResponse<>(
-                                                                                                                        MessageUtil.FAIL,
-                                                                                                                        HttpStatus.CONFLICT
-                                                                                                                                        .value(),
-                                                                                                                        MessageUtil.DUPLICATE_SUBSCRIPTION)));
+                                                                                ResponseEntity.ok(
+                                                                                new ApiResponse<>(
+                                                                                MessageUtil.FAIL,
+                                                                                HttpStatus.CONFLICT.value(),
+                                                                                MessageUtil.DUPLICATE_SUBSCRIPTION)));
                                                                 }
 
                                                                 // Perform the subscription logic and save the
@@ -100,6 +108,9 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                                 SubscriberProducer newSubscription = new SubscriberProducer();
                                                                 newSubscription.setProducerId(producerId);
                                                                 newSubscription.setSubscriberId(subscriberId);
+                                                                // newSubscription.setSubscriber(null);
+                                                                // newSubscription.setProducer(null);
+                                                        
 
                                                                 return ((CompletionStage<ResponseEntity<List<String>>>) producerRepository
                                                                                 .save(newSubscription))

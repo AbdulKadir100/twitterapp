@@ -1,6 +1,7 @@
 package com.kadir.abdul.Twitter_App.service.Imlp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.kadir.abdul.Twitter_App.dto.MessageResponse;
 import com.kadir.abdul.Twitter_App.dto.PublishMesssageRequest;
@@ -27,6 +29,7 @@ import com.kadir.abdul.Twitter_App.utils.MessageUtil;
 
 @Service
 public class MessageServiceImpl implements MessageService {
+
         @Autowired
         private MessageRepository messageRepository;
         @Autowired
@@ -42,6 +45,25 @@ public class MessageServiceImpl implements MessageService {
                 this.userRepository = userRepository;
                 this.producerRepository = producerRepository;
         }
+
+
+        // public Map<User,List<Message>> getAllUserMessagesL(){
+        //         return messageRepository.findAll()
+        //         .stream()
+        //         .collect(Collectors.groupingBy(Message::getUser));
+        // }
+
+        // public Long getAllMessagesCount(){
+        //         return messageRepository.findAll()
+        //         .stream()
+        //         .collect(Collectors.counting());
+        // }
+
+        // public Long getAllUserMessages(){
+        //         return messageRepository.findAll()
+        //         .stream()
+        //         .collect(Collectors.summingLong(Message::getMid));
+        // }
 
         @Async
         public CompletableFuture<User> validateUserExists(Long userId) {
@@ -148,6 +170,7 @@ public class MessageServiceImpl implements MessageService {
         @Override
         public CompletableFuture<ResponseEntity<ApiResponse<List<MessageResponse>>>> getMessageBySubscriberId(
                         Long subscriberId) {
+                        // TODO: Need to write API for this method.
                 return validateUserExists(subscriberId) // CompletableFuture<User>
                                 .thenCompose(user -> producerRepository.listProducerBySubscriber(subscriberId) // CompletableFuture<List<Integer>>
                                                 .thenCompose(producerIds -> messageRepository
@@ -178,6 +201,8 @@ public class MessageServiceImpl implements MessageService {
                 String message = request.getMessage();
 
                 logger.info("Start processing publishMessage request for userId: {}", userId);
+                
+                logger.info("Start processing publishMessage request for message: {}", message);
 
                 return validateUserExists(userId)
                                 .thenCompose(user -> CompletableFuture.supplyAsync(() -> {
@@ -188,6 +213,7 @@ public class MessageServiceImpl implements MessageService {
                                                         Message.builder()
                                                                         .uid(userId)
                                                                         .contents(message)
+                                                                        .user(user)
                                                                         .build());
 
                                         logger.info("Message saved successfully for userId: {}", userId);
@@ -198,10 +224,14 @@ public class MessageServiceImpl implements MessageService {
                                 .thenApply(savedMessage -> ResponseEntity.ok(
                                                 new ApiResponse<>(MessageUtil.SUCCESS, HttpStatus.OK.value(),
                                                                 "Message published successfully")))
+
                                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                                 .body(new ApiResponse<>(MessageUtil.FAIL,
                                                                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                                                 "Message not published")));
+
+
+                                                                
         }
 
 }

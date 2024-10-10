@@ -1,7 +1,6 @@
 package com.kadir.abdul.Twitter_App.entity;
 
-import java.util.Collections;
-import java.util.HashSet;
+
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -30,9 +29,11 @@ public class User {
     private String uRole;
 
     @OneToMany(mappedBy = "subscriber", cascade = CascadeType.PERSIST)
-    private Set<SubscriberProducer> subscriptions =  Collections.synchronizedSet(new HashSet<>());
+    private Set<SubscriberProducer> subscriptions;
+    //=  Collections.synchronizedSet(new HashSet<>());
 
     @OneToMany(mappedBy = "producer", cascade = CascadeType.PERSIST)
-    private Set<SubscriberProducer> productions = Collections.synchronizedSet(new HashSet<>());
+    private Set<SubscriberProducer> productions;
+    // = Collections.synchronizedSet(new HashSet<>());
 
 }
