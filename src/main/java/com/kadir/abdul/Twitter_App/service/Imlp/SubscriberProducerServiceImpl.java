@@ -105,15 +105,20 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
 
                                                                 // Perform the subscription logic and save the
                                                                 // subscription
-                                                                SubscriberProducer newSubscription = new SubscriberProducer();
-                                                                newSubscription.setProducerId(producerId);
-                                                                newSubscription.setSubscriberId(subscriberId);
+                                                                //SubscriberProducer newSubscription = new SubscriberProducer();
+                                                                //newSubscription.setProducerId(producerId);
+                                                                //newSubscription.setSubscriberId(subscriberId);
                                                                 // newSubscription.setSubscriber(null);
                                                                 // newSubscription.setProducer(null);
                                                         
 
                                                                 return ((CompletionStage<ResponseEntity<List<String>>>) producerRepository
-                                                                                .save(newSubscription))
+                                                                                .save(SubscriberProducer.builder()
+                                                                                .producerId(producerId)
+                                                                                .subscriberId(subscriberId)
+                                                                                .build()
+                                                                                )
+                                                                                )
                                                                                 .thenApply(savedSubscription -> ResponseEntity
                                                                                                 .ok(new ApiResponse<>(
                                                                                                                 MessageUtil.SUCCESS,
