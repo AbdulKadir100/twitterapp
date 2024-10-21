@@ -1,6 +1,7 @@
 package com.kadir.abdul.Twitter_App.repository;
 
 import java.util.List;
+import java.util.Optional;
 ///import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Async
     @Query("SELECT u FROM User u WHERE u.uName = :uName")
-    CompletableFuture<User> findByUsername(@Param("uName") String uName);
+    CompletableFuture<Optional<User>> findByUsername(@Param("uName") String uName);
 
     @Async
     @Query("SELECT u FROM User u WHERE u.uRole = :role")

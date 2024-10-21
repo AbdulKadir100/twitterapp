@@ -16,6 +16,8 @@ import com.kadir.abdul.Twitter_App.dto.Subscribe;
 import com.kadir.abdul.Twitter_App.response.ApiResponse;
 import com.kadir.abdul.Twitter_App.service.SubscriberProducerService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v2")
 public class SubscriberProducerController {
@@ -33,7 +35,7 @@ public class SubscriberProducerController {
 
 
     @PostMapping("/subscribe")
-    public CompletableFuture<ResponseEntity<ApiResponse<String>>> subscribe(@RequestBody Subscribe request) {
+    public CompletableFuture<ResponseEntity<ApiResponse<String>>> subscribe(@RequestBody @Valid Subscribe request) {
         return subscriberProducerService.subscribe(request);
     }
 

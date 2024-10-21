@@ -29,8 +29,8 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/publish")
     @Operation(description = "Publishes users messages")
+    @PostMapping("/publish")
     public CompletableFuture<ResponseEntity<ApiResponse<String>>> publishMessage(
             @Valid @RequestBody PublishMesssageRequest request) {
         return messageService.publishMessage(request);

@@ -1,8 +1,5 @@
 package com.kadir.abdul.Twitter_App.dto;
 
-import java.util.Set;
-
-import com.kadir.abdul.Twitter_App.entity.SubscriberProducer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
