@@ -54,7 +54,7 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                 Long subscriberId = request.getSubscriberID();
                 Long producerId = request.getUserId();
 
-                log.info("Subscriber ID: {}",subscriberId);
+                log.info("Subscriber ID: {}", subscriberId);
                 log.info("Producer ID: {}", producerId);
 
                 // Check if both subscriber and producer exist
@@ -82,12 +82,18 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                                                 MessageUtil.RECORD_NOT_FOUND)));
                                         }
 
-                                        else if (!"Producer".equalsIgnoreCase(producerApiResponse.getData().getURole())) {
+                                else if (producerApiResponse.getData() == null
+                                                || producerApiResponse.getData().getURole() == null ||
+                                                !"Producer".equalsIgnoreCase(
+                                                                producerApiResponse.getData().getURole())) {
+                                                log.info("Producer role is either null or not 'Producer': "
+                                                                + producerApiResponse.getData().getURole());
                                                 return CompletableFuture.completedFuture(
-                                                                ResponseEntity.ok(new ApiResponse<>(
-                                                                        MessageUtil.FAIL,
-                                                                        HttpStatus.FORBIDDEN.value(),
-                                                                        MessageUtil.SUBSCRIPTION_NOT_ALLOW)));
+                                                                ResponseEntity.ok(
+                                                                                new ApiResponse<>(MessageUtil.FAIL,
+                                                                                                HttpStatus.FORBIDDEN
+                                                                                                                .value(),
+                                                                                                MessageUtil.SUBSCRIPTION_NOT_ALLOW)));
                                         }
 
                                         // Validate that a subscriber cannot make multiple subscriptions for the same
@@ -96,29 +102,28 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                         .thenCompose(existingSubscription -> {
                                                                 if (existingSubscription != null) {
                                                                         return CompletableFuture.completedFuture(
-                                                                                ResponseEntity.ok(
-                                                                                new ApiResponse<>(
-                                                                                MessageUtil.FAIL,
-                                                                                HttpStatus.CONFLICT.value(),
-                                                                                MessageUtil.DUPLICATE_SUBSCRIPTION)));
+                                                                                        ResponseEntity.ok(
+                                                                                                        new ApiResponse<>(
+                                                                                                                        MessageUtil.FAIL,
+                                                                                                                        HttpStatus.CONFLICT
+                                                                                                                                        .value(),
+                                                                                                                        MessageUtil.DUPLICATE_SUBSCRIPTION)));
                                                                 }
 
                                                                 // Perform the subscription logic and save the
                                                                 // subscription
-                                                                //SubscriberProducer newSubscription = new SubscriberProducer();
-                                                                //newSubscription.setProducerId(producerId);
-                                                                //newSubscription.setSubscriberId(subscriberId);
+                                                                // SubscriberProducer newSubscription = new
+                                                                // SubscriberProducer();
+                                                                // newSubscription.setProducerId(producerId);
+                                                                // newSubscription.setSubscriberId(subscriberId);
                                                                 // newSubscription.setSubscriber(null);
                                                                 // newSubscription.setProducer(null);
-                                                        
 
                                                                 return ((CompletionStage<ResponseEntity<List<String>>>) producerRepository
                                                                                 .save(SubscriberProducer.builder()
-                                                                                .producerId(producerId)
-                                                                                .subscriberId(subscriberId)
-                                                                                .build()
-                                                                                )
-                                                                                )
+                                                                                                .producerId(producerId)
+                                                                                                .subscriberId(subscriberId)
+                                                                                                .build()))
                                                                                 .thenApply(savedSubscription -> ResponseEntity
                                                                                                 .ok(new ApiResponse<>(
                                                                                                                 MessageUtil.SUCCESS,

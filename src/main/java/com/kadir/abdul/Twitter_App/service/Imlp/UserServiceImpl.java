@@ -32,15 +32,8 @@ public class UserServiceImpl implements UserService {
                 this.userRepository = userRepository;
         }
 
-         @Async
+        @Async
         public CompletableFuture<User> validateUserExists(Long userId) {
-
-                Optional<User> opUser = userRepository.findById(userId);
-
-                if (!opUser.isPresent()) {
-                        logger.info("User not found" + opUser.get());
-                }
-
                 return CompletableFuture.supplyAsync(() -> userRepository.findById(userId))
                                 .thenApply(optionalUser -> {
                                         if (optionalUser.isPresent()) {
