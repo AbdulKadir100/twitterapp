@@ -21,22 +21,35 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v2")
 public class SubscriberProducerController {
-    @Autowired
-    private SubscriberProducerService subscriberProducerService;
 
+    private final SubscriberProducerService subscriberProducerService;
+
+    @Autowired
     public SubscriberProducerController(SubscriberProducerService subscriberProducerService) {
         this.subscriberProducerService = subscriberProducerService;
     }
 
+    /**
+     * Get a list of producers for a specific subscriber.
+     * 
+     * @param subscriberId ID of the subscriber.
+     * @return CompletableFuture with ResponseEntity containing a list of producer
+     *         IDs.
+     */
     @GetMapping("/{subscriberId}/producers")
     public CompletableFuture<ResponseEntity<List<Long>>> getProducersBySubscriber(@PathVariable Long subscriberId) {
         return subscriberProducerService.listProducerBySubscriber(subscriberId);
     }
 
-
+    /**
+     * Subscribe a subscriber to a producer.
+     * 
+     * @param request Subscribe request containing subscriber and producer
+     *                information.
+     * @return CompletableFuture with ResponseEntity containing ApiResponse.
+     */
     @PostMapping("/subscribe")
     public CompletableFuture<ResponseEntity<ApiResponse<String>>> subscribe(@RequestBody @Valid Subscribe request) {
         return subscriberProducerService.subscribe(request);
     }
-
 }

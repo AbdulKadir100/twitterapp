@@ -21,19 +21,25 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/user")
 @Tag(description = "Fetch User message", name = "MESSAGE")
 public class FetchUserMessagesController {
-    @Autowired
-    private MessageService messageService;
 
+    private final MessageService messageService;
+
+    @Autowired
     public FetchUserMessagesController(MessageService messageService) {
         this.messageService = messageService;
     }
 
+    /**
+     * Get all messages for a specific user.
+     * 
+     * @param id User ID.
+     * @return CompletableFuture with ResponseEntity containing ApiResponse with
+     *         list of messages.
+     */
     @GetMapping("/{id}")
     @Operation(description = "Get all user messages")
     public CompletableFuture<ResponseEntity<ApiResponse<List<MessageResponse>>>> getUserMessages(
             @PathVariable(name = "id") Long id) {
         return messageService.getUserMessages(id);
-
     }
-
 }
