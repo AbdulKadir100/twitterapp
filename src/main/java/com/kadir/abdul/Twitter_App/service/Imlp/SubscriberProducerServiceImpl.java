@@ -83,17 +83,17 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                         }
 
                                 else if (producerApiResponse.getData() == null
-                                                || producerApiResponse.getData().getURole() == null ||
-                                                !"Producer".equalsIgnoreCase(
+                                                || producerApiResponse.getData().getURole() == null
+                                                || !"Producer".equalsIgnoreCase(
                                                                 producerApiResponse.getData().getURole())) {
-                                                log.info("Producer role is either null or not 'Producer': "
-                                                                + producerApiResponse.getData().getURole());
+                                                String role = producerApiResponse.getData() != null
+                                                                ? producerApiResponse.getData().getURole()
+                                                                : "null";
+                                                log.info("Producer role check failed. Role: " + role);
                                                 return CompletableFuture.completedFuture(
-                                                                ResponseEntity.ok(
-                                                                                new ApiResponse<>(MessageUtil.FAIL,
-                                                                                                HttpStatus.FORBIDDEN
-                                                                                                                .value(),
-                                                                                                MessageUtil.SUBSCRIPTION_NOT_ALLOW)));
+                                                                ResponseEntity.ok(new ApiResponse<>(MessageUtil.FAIL,
+                                                                                HttpStatus.FORBIDDEN.value(),
+                                                                                MessageUtil.SUBSCRIPTION_NOT_ALLOW)));
                                         }
 
                                         // Validate that a subscriber cannot make multiple subscriptions for the same
