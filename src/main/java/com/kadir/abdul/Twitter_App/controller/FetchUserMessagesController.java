@@ -18,13 +18,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/user")
 @Tag(description = "Fetch User message", name = "MESSAGE")
 public class FetchUserMessagesController {
 
+    @Autowired
     private final MessageService messageService;
 
-    @Autowired
+    
     public FetchUserMessagesController(MessageService messageService) {
         this.messageService = messageService;
     }

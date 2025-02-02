@@ -30,11 +30,11 @@ import com.kadir.abdul.Twitter_App.utils.MessageUtil;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-        @Autowired
+        
         private MessageRepository messageRepository;
-        @Autowired
+        
         private UserRepository userRepository;
-        @Autowired
+
         private SubscriberProducerRepository producerRepository;
 
         private final Logger logger = LoggerFactory.getLogger(MessageServiceImpl.class);
@@ -176,10 +176,10 @@ public class MessageServiceImpl implements MessageService {
                                                 .thenCompose(producerIds -> messageRepository
                                                                 .listMessageByProducerIdIn(producerIds) // CompletableFuture<List<Message>>
                                                                 .thenCompose(messages -> producerOutcome(messages)) // CompletableFuture<ResponseEntity<ApiResponse<List<MessageResponse>>>>
-                                                                .exceptionally(ex -> handleFailure(ex))));
+                                                                .exceptionally(this::handleFailure)));
         }
 
-        private ResponseEntity<ApiResponse<List<MessageResponse>>> handleFailure(Throwable ex) {
+        public ResponseEntity<ApiResponse<List<MessageResponse>>> handleFailure(Throwable ex) {
                 ApiResponse<List<MessageResponse>> errorResponse = new ApiResponse<>(
                                 HttpStatus.EXPECTATION_FAILED.toString(),
                                 HttpStatus.EXPECTATION_FAILED.value(), null);
