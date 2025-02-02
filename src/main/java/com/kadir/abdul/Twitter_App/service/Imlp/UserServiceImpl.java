@@ -1,7 +1,6 @@
 package com.kadir.abdul.Twitter_App.service.Imlp;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -105,12 +104,12 @@ public class UserServiceImpl implements UserService {
 
                 return CompletableFuture.supplyAsync(() -> userRepository.findUserByRole(role))
                                 .thenCompose(users -> {
-                                        if (users.isEmpty() || users == null) {
-                                                return CompletableFuture.completedFuture(
-                                                                ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                                                                .body(new ApiResponse<>(
-                                                                                                "No users found for the given role")));
-                                        }
+                                        // if (users.isEmpty()) {
+                                        //         return CompletableFuture.completedFuture(
+                                        //                         ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        //                                         .body(new ApiResponse<>(
+                                        //                                                         "No users found for the given role")));
+                                        // }
 
                                         // Logging the event (assuming logger is properly configured)
                                         logger.info("Users found for role: {}", role);

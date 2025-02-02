@@ -28,6 +28,8 @@ public class User {
     private String uName;
     private String uRole;
 
+    
+
     @OneToMany(mappedBy = "subscriber", cascade = CascadeType.PERSIST)
     private Set<SubscriberProducer> subscriptions;
     //=  Collections.synchronizedSet(new HashSet<>());
@@ -35,5 +37,11 @@ public class User {
     @OneToMany(mappedBy = "producer", cascade = CascadeType.PERSIST)
     private Set<SubscriberProducer> productions;
     // = Collections.synchronizedSet(new HashSet<>());
+
+    public User(Long uid,String uName, String uRole) {
+        this.uid = uid;
+        this.uName = uName;
+        this.uRole = uRole;
+    }
 
 }
