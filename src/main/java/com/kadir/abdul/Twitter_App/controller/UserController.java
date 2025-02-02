@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kadir.abdul.Twitter_App.dto.AddUserRequest;
 import com.kadir.abdul.Twitter_App.dto.UserDto;
+import com.kadir.abdul.Twitter_App.entity.User;
 import com.kadir.abdul.Twitter_App.response.ApiResponse;
 import com.kadir.abdul.Twitter_App.service.UserService;
+import com.kadir.abdul.Twitter_App.service.Imlp.ApiService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +26,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/v1")
 public class UserController {
 
+    
     private final UserService userService;
+    // @Autowired
+    // private final ApiService apiService;
 
-    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+        //this.apiService = apiService;
     }
 
     /**
@@ -37,7 +42,7 @@ public class UserController {
      * @param request AddUserRequest containing user details.
      * @return CompletableFuture with ResponseEntity containing ApiResponse.
      */
-    @PostMapping("/addUser")
+    @PostMapping("/users/addUser")
     public CompletableFuture<ResponseEntity<ApiResponse<String>>> addUser(@RequestBody AddUserRequest request) {
         return userService.addUser(request);
     }
@@ -76,4 +81,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         });
     }
+
+    // @GetMapping("/user/{id}")
+    // public ResponseEntity<User> getUserByIdRestTemplate(@PathVariable Long id) {
+    //     User user = apiService.getUserById(id);
+    //     return ResponseEntity.ok(user);
+    // }
 }

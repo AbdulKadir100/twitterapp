@@ -22,9 +22,10 @@ import jakarta.validation.Valid;
 @Tag(description = "Publish Message", name = "PUBLISH MESSAGE")
 public class MessageController {
 
+    @Autowired
     private final MessageService messageService;
 
-    @Autowired
+   
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
     }
@@ -38,7 +39,7 @@ public class MessageController {
     @Operation(description = "Publishes users messages")
     @PostMapping("/publish")
     public CompletableFuture<ResponseEntity<ApiResponse<String>>> publishMessage(
-            @Valid @RequestBody PublishMesssageRequest request) {
+        @Valid @RequestBody PublishMesssageRequest request) {
         return messageService.publishMessage(request);
     }
 }
