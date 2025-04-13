@@ -16,7 +16,6 @@ import com.kadir.abdul.Twitter_App.dto.UserDto;
 import com.kadir.abdul.Twitter_App.entity.User;
 import com.kadir.abdul.Twitter_App.response.ApiResponse;
 import com.kadir.abdul.Twitter_App.service.UserService;
-import com.kadir.abdul.Twitter_App.service.Imlp.ApiService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,9 +81,19 @@ public class UserController {
         });
     }
 
-    // @GetMapping("/user/{id}")
-    // public ResponseEntity<User> getUserByIdRestTemplate(@PathVariable Long id) {
-    //     User user = apiService.getUserById(id);
-    //     return ResponseEntity.ok(user);
-    // }
+    @GetMapping("/users/name")
+    public CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> getUserByName(@RequestParam(value = "name") String name){
+        return userService.findByName(name).exceptionally(ex->{
+            ApiResponse<UserDto> response = new ApiResponse<>(
+                    ex.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        });
+    }
+/**
+ * Needs to add more API like: Get All by role.
+ *                             Get All by valid subscription.
+ *                             Get All by staying in prod.
+ * */
 }

@@ -113,19 +113,22 @@ public class MessageServiceImpl implements MessageService {
                                 .map(message -> {
 
                                         Optional<User> userFuture = userRepository.findById(message.getUid());
-                                        CompletableFuture<User> userCompletableFuture = optionalToCompletableFuture(
-                                                        userFuture);
+                                        logger.info("User with id : "+userFuture.get());
+                                        CompletableFuture<User> userCompletableFuture = optionalToCompletableFuture(userFuture);
 
                                         return userCompletableFuture.thenApply(user -> {
                                                 UserResponse userResponse = UserResponse.builder()
                                                                 .uid(user.getUid())
                                                                 .uName(user.getUName())
                                                                 .build();
-                                                return MessageResponse.builder()
+                                                logger.info("User response is : "+userResponse.toString());                
+                                                MessageResponse messageResponse =  MessageResponse.builder()
                                                                 .contents(message.getContents())
                                                                 .mid(message.getMid())
                                                                 .postedBy(userResponse)
                                                                 .build();
+                                                logger.info("Message response is : "+messageResponse.toString());    
+                                                return messageResponse;            
                                         });
                                 })
                                 .collect(Collectors.toList());
