@@ -91,6 +91,17 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         });
     }
+
+    @GetMapping("/users/by_name")
+    public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> getAllUserByName(@RequestParam(value = "name") String name){
+        return userService.findAllByName(name).exceptionally(ex->{
+            ApiResponse<List<UserDto>> response = new ApiResponse<>(
+                    ex.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        });
+    }
 /**
  * Needs to add more API like: Get All by role.
  *                             Get All by valid subscription.

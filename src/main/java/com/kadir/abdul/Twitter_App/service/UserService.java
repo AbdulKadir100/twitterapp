@@ -14,5 +14,7 @@ public interface UserService {
     CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findUserListByRole(String role);
     CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> findById(Long id);
     CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> findByName(String name);
+    CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findAllByName(String name);
+
 
 }

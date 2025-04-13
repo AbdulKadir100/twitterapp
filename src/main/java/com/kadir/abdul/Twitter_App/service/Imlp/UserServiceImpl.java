@@ -193,4 +193,31 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    @Override
+    public CompletableFuture<ResponseEntity<ApiResponse<List<UserDto>>>> findAllByName(String name) {
+        return CompletableFuture.supplyAsync(() -> userRepository.findAll())
+                .thenApply(users -> {
+                    if (users.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                                new ApiResponse<>(MessageUtil.RECORD_NOT_FOUND, HttpStatus.NOT_FOUND.value())
+                        );
+                    }
+
+                    List<UserDto> userDtos = users.stream()
+                            .filter(user -> user.getUName().equalsIgnoreCase(name))
+                            .map(user -> new UserDto(user.getUid(), user.getUName(), user.getURole()))
+                            .toList();
+
+                    if (userDtos.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                                new ApiResponse<>(MessageUtil.RECORD_NOT_FOUND, HttpStatus.NOT_FOUND.value())
+                        );
+                    }
+
+                    return ResponseEntity.ok(
+                            new ApiResponse<>(MessageUtil.SUCCESS, HttpStatus.OK.value(), userDtos)
+                    );
+                });
+    }
+
 }
