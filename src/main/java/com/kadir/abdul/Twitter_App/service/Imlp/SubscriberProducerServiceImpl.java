@@ -89,7 +89,7 @@ public class SubscriberProducerServiceImpl implements SubscriberProducerService 
                                                 String role = producerApiResponse.getData() != null
                                                                 ? producerApiResponse.getData().getURole()
                                                                 : "null";
-                                                log.info("Producer role check failed. Role: " + role);
+                                            log.info("Producer role check failed. Role: {}", role);
                                                 return CompletableFuture.completedFuture(
                                                                 ResponseEntity.ok(new ApiResponse<>(MessageUtil.FAIL,
                                                                                 HttpStatus.FORBIDDEN.value(),

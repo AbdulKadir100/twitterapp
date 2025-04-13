@@ -1,7 +1,9 @@
 package com.kadir.abdul.Twitter_App.service.Imlp;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -22,7 +24,6 @@ import com.kadir.abdul.Twitter_App.utils.MessageUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
-        @Autowired
         private final UserRepository userRepository;
 
         private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -160,5 +161,36 @@ public class UserServiceImpl implements UserService {
                                                                         HttpStatus.OK.value(), userDto)));
                                 });
         }
+
+    @Override
+    public CompletableFuture<ResponseEntity<ApiResponse<UserDto>>> findByName(String name) {
+        return CompletableFuture.supplyAsync(() -> userRepository.findByUsername(name))
+                .thenCompose(userOptional -> {
+                    try {
+                        if (userOptional.get().isEmpty()){
+                            return CompletableFuture.completedFuture(
+                                    ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                                            new ApiResponse<>(
+                                                    MessageUtil.RECORD_NOT_FOUND,
+                                                    HttpStatus.NOT_FOUND.value()
+                                            )
+                                    )
+                            );
+                        }
+
+                        User user = userOptional.get().orElseThrow();
+                        UserDto userDto = new UserDto(user.getUid(),user.getUName(),user.getURole());
+                        return CompletableFuture.completedFuture(
+                                ResponseEntity.ok(new ApiResponse<>(MessageUtil.SUCCESS,
+                                        HttpStatus.OK.value(), userDto)));
+
+
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
 
 }
